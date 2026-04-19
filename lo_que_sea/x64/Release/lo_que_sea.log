@@ -1,0 +1,9 @@
+﻿  trabajofinal.cpp
+  shell.c
+  sqlite3.c
+LINK : warning LNK4067: punto de entrada ambiguo; se seleccionó 'mainCRTStartup'
+  Generando código
+  Previous IPDB not found, fall back to full compilation.
+  All 4038 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Generación de código finalizada
+  lo_que_sea.vcxproj -> G:\proyecto_final_peaje_electronico\x64\Release\lo_que_sea.exe

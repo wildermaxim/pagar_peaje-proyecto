@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peaje Pamplonita · Sistema de Recaudo</title>
+    <link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header class="header">
+        <div class="header-marca">
+            <div class="header-escudo">🛣️</div>
+            <div class="header-titulo">
+                <h1>Peaje Pamplonita</h1>
+                <span>Sistema de Recaudo — Cúcuta · Pamplonita</span>
+            </div>
+        </div>
+        <div class="header-info">
+            <span id="badgePico" class="badge-pico">⚡ Hora pico</span>
+            <span id="reloj" class="header-reloj">--:--:--</span>
+        </div>
+    </header>
+
+    <!-- ═══════════════ LAYOUT ═══════════════ -->
+    <div class="layout">
+
+        <!-- ── PANEL IZQUIERDO: búsqueda + estado ── -->
+        <aside class="panel-izq">
+
+            <!-- Búsqueda de placa -->
+            <div>
+                <p class="seccion-label">Búsqueda</p>
+                <div class="tarjeta">
+                    <p class="tarjeta-titulo">Identificación de Vehículo</p>
+                    <div class="form-placa">
+                        <div class="input-grupo">
+                            <label class="input-label">Placa</label>
+                            <input id="inputPlaca"
+                                   class="input-placa"
+                                   type="text"
+                                   maxlength="7"
+                                   placeholder="AAA000"
+                                   autocomplete="off"
+                                   spellcheck="false" />
+                        </div>
+                        <button class="btn btn-primary" onclick="buscarPlaca()">
+                            <span id="loaderBuscar" class="loader"></span>
+                            🔍 Consultar Placa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado del vehículo encontrado -->
+            <div id="estadoVehiculo" class="estado-vehiculo">
+
+                <!-- Con TAG -->
+                <div id="panelTag" style="display:none;">
+                    <p class="seccion-label">Vehículo con TAG</p>
+                    <div class="tarjeta">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                            <span id="tagChip" class="chip-tag con-tag">✅ TAG Activo</span>
+                            <span id="picoBadgeSide" class="chip-tag pico" style="display:none;">⚡ Hora pico</span>
+                        </div>
+
+                        <div id="infoTag" class="info-vehiculo">
+                            <!-- llenado por JS -->
+                        </div>
+
+                        <div id="saldoTag" class="saldo-display" style="margin:12px 0;">
+                            <div class="saldo-label">Saldo TAG Disponible</div>
+                            <div id="saldoValor" class="saldo-valor">$0</div>
+                        </div>
+
+                        <div id="alertaSaldo" class="alerta alerta-multa">
+                            <span class="alerta-icono">⚠️</span>
+                            <div>
+                                <strong>Saldo insuficiente.</strong><br>
+                                El vehículo debe pagar en <b>efectivo</b>.
+                            </div>
+                        </div>
+
+                        <div id="resumenTag" class="resumen-cobro" style="margin-bottom:14px;">
+                            <!-- llenado por JS -->
+                        </div>
+
+                        <button id="btnCobrarTag" class="btn btn-success btn-lg" onclick="cobrarTag()">
+                            💳 Cobrar por TAG
+                        </button>
+                        <button id="btnForzarEfectivo" class="btn btn-ghost mt-8" onclick="forzarEfectivo()" style="display:none;">
+                            💵 Pagar en efectivo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sin TAG -->
+                <div id="panelSinTag" style="display:none;">
+                    <p class="seccion-label">Vehículo sin TAG</p>
+                    <div class="tarjeta">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <span class="chip-tag sin-tag">💵 Pago en Efectivo</span>
+                            <span id="picoBadgeSinTag" class="chip-tag pico" style="display:none;">⚡ Hora pico</span>
+                        </div>
+                        <p style="font-size:13px; color:var(--gris-claro); margin-bottom:12px;">
+                            Placa <b id="placaSinTagLabel" style="color:var(--blanco); font-family:var(--mono);">---</b> no registrada en el sistema TAG. Complete los datos del vehículo.
+                        </p>
+                        <button class="btn btn-azul" onclick="mostrarFormEfectivo()">
+                            📋 Registrar y Cobrar
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /estadoVehiculo -->
+            <!-- Accesos rápidos -->
+            <div>
+                <p class="seccion-label">Accesos</p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn btn-ghost btn-sm" onclick="mostrarVista('historial'); cargarHistorial();">
+                        📜 Ver Historial de Recibos
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="mostrarVista('tarifas')">
+                        📋 Tabla de Tarifas
+                    </button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- ── PANEL DERECHO: vistas ── -->
+        <main class="panel-der">
+
+            <!-- Nav tabs -->
+            <nav class="nav-vistas">
+                <button class="nav-tab activo" id="tab-inicio" onclick="mostrarVista('inicio')">
+                    🏠 Inicio
+                </button>
+                <button class="nav-tab" id="tab-cobro" onclick="mostrarVista('cobro')">
+                    💳 Cobro Efectivo
+                </button>
+                <button class="nav-tab" id="tab-tarifas" onclick="mostrarVista('tarifas')">
+                    📋 Tarifas
+                </button>
+                <button class="nav-tab" id="tab-historial" onclick="mostrarVista('historial'); cargarHistorial();">
+                    📜 Historial
+                </button>
+            </nav>
+
+            <!-- ── VISTA: INICIO ── -->
+            <section id="vista-inicio" class="vista activa">
+                <div id="statsGrid" class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-valor" id="statTotal">0</div>
+                        <div class="stat-label">Vehículos hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-valor" id="statTag">0</div>
+                        <div class="stat-label">Cobros TAG</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-valor" id="statEfectivo">0</div>
+                        <div class="stat-label">Cobros Efectivo</div>
+                    </div>
+                </div>
+
+                <div class="tarjeta">
+                    <p class="tarjeta-titulo">Instrucciones de Operación</p>
+                    <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:var(--blanco-suave); line-height:1.7;">
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--amarillo); font-weight:700; font-family:var(--mono); width:24px;">1.</span>
+                            <span>Ingrese la placa del vehículo en el campo de búsqueda y haga clic en <b>Consultar Placa</b>.</span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--amarillo); font-weight:700; font-family:var(--mono); width:24px;">2.</span>
+                            <span>Si la placa está registrada con TAG y tiene saldo, pulse <b>Cobrar por TAG</b> para descuento automático.</span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--amarillo); font-weight:700; font-family:var(--mono); width:24px;">3.</span>
+                            <span>Si el vehículo no tiene TAG o no tiene saldo, seleccione la categoría y el peso para cobro en <b>efectivo</b>.</span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--amarillo); font-weight:700; font-family:var(--mono); width:24px;">4.</span>
+                            <span>Si el conductor es residente de la zona, active la opción <b>Residente IE</b> para aplicar tarifa especial.</span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--naranja); font-weight:700; font-family:var(--mono); width:24px;">⚡</span>
+                            <span>En horario de <b>6:00 a 9:00 AM</b> se aplica automáticamente un recargo del <b>10%</b>.</span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <span style="color:var(--rojo); font-weight:700; font-family:var(--mono); width:24px;">⚠️</span>
+                            <span>Si el peso declarado supera en más de <b>1 tonelada</b> el límite de su categoría, se aplicará una multa de <b>$1.266.222</b> y se ordenará detener el vehículo.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta mt-16">
+                    <p class="tarjeta-titulo">Placas de prueba (con TAG)</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-ghost btn-sm" onclick="probarPlaca('ABC123')">ABC123 · Cat. I</button>
+                        <button class="btn btn-ghost btn-sm" onclick="probarPlaca('XYZ789')">XYZ789 · Cat. II</button>
+                        <button class="btn btn-ghost btn-sm" onclick="probarPlaca('PQR456')">PQR456 · Cat. IV</button>
+                        <button class="btn btn-ghost btn-sm" onclick="probarPlaca('GHJ321')">GHJ321 · IE (Res.)</button>
+                        <button class="btn btn-ghost btn-sm" onclick="probarPlaca('KLM654')">KLM654 · Cat. V</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── VISTA: COBRO EFECTIVO ── -->
+            <section id="vista-cobro" class="vista">
+                <div class="tarjeta">
+                    <p class="tarjeta-titulo">Registro de Pago en Efectivo</p>
+
+                    <!-- Toggle residente -->
+                    <div style="margin-bottom:18px;">
+                        <p class="input-label" style="margin-bottom:8px;">¿Es residente de la zona?</p>
+                        <div id="toggleResidente" class="toggle-residente" onclick="toggleResidente()">
+                            <input type="checkbox" id="chkResidente" />
+                            <div class="toggle-check" id="checkVisual">✓</div>
+                            <div>
+                                <div class="toggle-texto">Residente — Tarifa IE</div>
+                                <div class="toggle-sub">Habitante de la zona beneficiaria del Peaje Pamplonita</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-efectivo">
+                        <div class="form-row">
+                            <div class="form-campo">
+                                <label>Placa del vehículo</label>
+                                <input id="efPlaca" type="text" maxlength="7" placeholder="AAA000" style="font-family:var(--mono); font-size:16px; letter-spacing:3px; text-transform:uppercase;" />
+                            </div>
+                            <div class="form-campo">
+                                <label>Peso (toneladas)</label>
+                                <input id="efPeso" type="number" min="0" max="60" step="0.1" placeholder="Ej: 3.5" oninput="actualizarResumenEfectivo()" />
+                            </div>
+                        </div>
+
+                        <div class="form-campo">
+                            <label>Categoría del vehículo</label>
+                            <select id="efCategoria" onchange="actualizarResumenEfectivo()">
+                                <option value="">— Seleccione categoría —</option>
+                                <optgroup label="─── Categorías Normales ───" id="optsNormales"></optgroup>
+                                <optgroup label="─── Categorías IE (Residentes) ───" id="optsIE" style="display:none;"></optgroup>
+                            </select>
+                        </div>
+
+                        <!-- Alerta multa -->
+                        <div id="alertaMultaEf" class="alerta alerta-multa">
+                            <span class="alerta-icono">🚨</span>
+                            <div>
+                                <strong>EXCESO DE PESO DETECTADO</strong><br>
+                                El vehículo supera el límite permitido en más de 1 tonelada.<br>
+                                Se aplicará una multa de <b>$1.266.222</b>.<br>
+                                <span style="color:var(--rojo); font-weight:700;">⛔ DETENGA EL VEHÍCULO</span>
+                            </div>
+                        </div>
+
+                        <!-- Alerta pico -->
+                        <div id="alertaPicoEf" class="alerta alerta-info" style="display:none;">
+                            <span class="alerta-icono">⚡</span>
+                            <div>
+                                <strong>Horario Pico (6:00 – 9:00 AM)</strong><br>
+                                Se aplica un recargo del 10% sobre la tarifa base.
+                            </div>
+                        </div>
+
+                        <!-- Resumen -->
+                        <div id="resumenEfectivo" class="resumen-cobro" style="display:none;">
+                            <!-- llenado por JS -->
+                        </div>
+
+                        <button class="btn btn-success btn-lg" onclick="cobrarEfectivo()">
+                            💵 Registrar Cobro en Efectivo
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── VISTA: TARIFAS ── -->
+            <section id="vista-tarifas" class="vista">
+                <div class="tarjeta" style="margin-bottom:20px;">
+                    <p class="tarjeta-titulo">Tarifas Vigentes — Peaje Pamplonita</p>
+                    <table class="tabla-tarifas">
+                        <thead>
+                            <tr>
+                                <th>Cat.</th>
+                                <th>Descripción</th>
+                                <th>Peso Máx.</th>
+                                <th>Tarifa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCategoriasNorm"></tbody>
+                    </table>
+                </div>
+                <div class="tarjeta">
+                    <p class="tarjeta-titulo" style="color:var(--verde);">Categorías Especiales — Residentes IE</p>
+                    <table class="tabla-tarifas">
+                        <thead>
+                            <tr>
+                                <th>Cat.</th>
+                                <th>Descripción</th>
+                                <th>Peso Máx.</th>
+                                <th>Tarifa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCategoriasIE"></tbody>
+                    </table>
+                    <p style="font-size:12px; color:var(--gris-claro); margin-top:12px; padding-top:12px; border-top:1px solid var(--borde);">
+                        * Las tarifas IE aplican únicamente para habitantes registrados de la zona de influencia del Peaje Pamplonita.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ── VISTA: HISTORIAL ── -->
+            <section id="vista-historial" class="vista">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div>
+                        <h2 style="font-size:16px; font-weight:700;">Historial de Recibos</h2>
+                        <p style="font-size:12px; color:var(--gris-claro); margin-top:2px;" id="subtituloHistorial">Últimos 50 registros</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="cargarHistorial()">🔄 Actualizar</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="historial-tabla">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Placa</th>
+                                <th>Categoría</th>
+                                <th>Peso (T)</th>
+                                <th>Tarifa</th>
+                                <th>Recargo</th>
+                                <th>Multa</th>
+                                <th>Total</th>
+                                <th>Método</th>
+                                <th>Hora</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyHistorial">
+                            <tr>
+                                <td colspan="11" class="text-center text-muted" style="padding:24px;">
+                                    Haga clic en "Actualizar" para cargar los registros.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div><!-- /layout -->
+    <!-- ═══════════════ MODAL RECIBO ═══════════════ -->
+    <div id="modalRecibo" class="recibo-modal">
+        <div class="recibo-contenido">
+            <button onclick="cerrarRecibo()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--gris-claro);font-size:20px;cursor:pointer;">✕</button>
+            <div class="recibo-encabezado">
+                <div style="font-size:36px; margin-bottom:8px;">🧾</div>
+                <h2>RECIBO DE PEAJE</h2>
+                <p>PEAJE PAMPLONITA · VÍA CÚCUTA–PAMPLONITA</p>
+            </div>
+            <div id="reciboContenidoInt"></div>
+            <div class="recibo-footer">
+                <p>Conserve este comprobante de pago.</p>
+                <p style="margin-top:4px;">Sistema de Recaudo — Transporte Nacional</p>
+            </div>
+            <button class="btn btn-primary mt-16" onclick="cerrarRecibo()">✔ Aceptar</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCRIPT ═══════════════ -->
+    <!--
+        RESPONSABILIDAD DEL JS:
+        El JavaScript SOLO se encarga de la interfaz visual (mostrar/ocultar paneles,
+        construir HTML dinámico, enviar formularios). NUNCA calcula tarifas, multas
+        ni recargos de forma definitiva: eso lo hace exclusivamente el servidor C++.
+        El resumen previo al cobro es solo orientativo para el operador.
+    -->
+    <script>
+
+        // ─── VARIABLES GLOBALES ──────────────────────────────────────────────────────────
+        const API = 'http://localhost:8080'; // dirección base del servidor C++
+
+        let esResidente    = false;               // estado del toggle "¿Es residente?"
+        let categorias     = { normales: [], ie: [] }; // categorías cargadas desde /api/categorias
+        let ultimaBusqueda = null;                // último resultado de /api/buscar-placa
+
+
+        // ─── UTILIDADES ──────────────────────────────────────────────────────────────────
+
+        // Formatea un número como precio en pesos colombianos.
+        // Ejemplo: fmt(13300) → "$13.300"
+        const fmt = (n) => '$' + Number(n).toLocaleString('es-CO', { minimumFractionDigits: 0 });
+
+        // Cambia la vista activa (inicio / cobro / tarifas / historial).
+        // Quita la clase "activa" de todas las secciones y se la da solo a la solicitada.
+        // También actualiza el tab de navegación resaltado.
+        function mostrarVista(id) {
+        document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));   // oculta todas las vistas
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('activo')); // desactiva todos los tabs
+        document.getElementById('vista-' + id).classList.add('activa');                  // muestra la vista solicitada
+        const tab = document.getElementById('tab-' + id);
+        if (tab) tab.classList.add('activo'); // resalta el tab correspondiente (si existe)
+        }
+
+        // Rellena el campo de placa con una placa de prueba y lanza la búsqueda.
+        // Usado por los botones de "Placas de prueba" en la pantalla de inicio.
+        function probarPlaca(p) {
+        document.getElementById('inputPlaca').value = p; // pone la placa en el input
+        buscarPlaca();                                    // lanza la búsqueda automáticamente
+        }
+
+        // Rellena el campo de placa en el formulario de cobro efectivo.
+        // Se llama cuando el operador pasa de buscar una placa a cobrarla en efectivo.
+        function setPlacaCobro(placa) {
+        placaActiva = placa;                                      // guarda en variable global
+        const input = document.getElementById('efPlaca');
+        if (input) input.value = placa;                           // rellena el campo del form
+        }
+
+
+        // ─── RELOJ ───────────────────────────────────────────────────────────────────────
+
+        // Actualiza el reloj del header cada segundo y muestra/oculta el badge "Hora pico".
+        // También activa la alerta de hora pico en el formulario de cobro efectivo.
+        function actualizarReloj() {
+        const now = new Date();
+        // Construye el texto "HH:MM:SS" con padding de ceros (ej. "08:05:03")
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+        const s = String(now.getSeconds()).padStart(2,'0');
+        document.getElementById('reloj').textContent = `${h}:${m}:${s}`; // actualiza el reloj del header
+
+        const esPico = now.getHours() >= 6 && now.getHours() < 9; // true entre 6:00 y 8:59
+        document.getElementById('badgePico').classList.toggle('activo', esPico); // muestra/oculta badge
+
+        // Si es hora pico, hace visible la alerta en el formulario de cobro efectivo
+        const alertaPico = document.getElementById('alertaPicoEf');
+        if (alertaPico && esPico) {
+        alertaPico.style.display = 'flex';
+        alertaPico.classList.add('visible');
+        }
+        }
+        setInterval(actualizarReloj, 1000); // ejecuta cada 1000ms (1 segundo)
+        actualizarReloj();                  // ejecuta de inmediato al cargar (sin esperar 1s)
+
+
+        // ─── CATEGORÍAS ──────────────────────────────────────────────────────────────────
+
+        // Solicita la lista de categorías al servidor C++ y llama a las funciones de render.
+        // Se ejecuta al cargar la página (en el evento DOMContentLoaded del final).
+        async function cargarCategorias() {
+        try {
+        const r = await fetch(`${API}/api/categorias`); // GET /api/categorias
+        categorias = await r.json();                     // guarda el objeto {normales:[], ie:[]}
+        renderTablasCategorias();                        // llena las tablas de la vista Tarifas
+        renderSelectCategorias();                        // llena el select del formulario Efectivo
+        } catch(e) {
+        console.error('Error cargando categorías:', e); // muestra en consola si el servidor no responde
+        }
+        }
+
+        // Llena las dos tablas de la vista "Tarifas" con los datos recibidos del servidor.
+        // tbNorm: tabla de categorías normales (I al V)
+        // tbIE:   tabla de categorías especiales para residentes
+        function renderTablasCategorias() {
+        const tbNorm = document.getElementById('tablaCategoriasNorm');
+        const tbIE   = document.getElementById('tablaCategoriasIE');
+
+        // map() convierte cada categoría en una fila HTML y join('') las une en un string
+        tbNorm.innerHTML = categorias.normales.map(c => `
+        <tr>
+        <td><span class="cat-badge">${c.nombre}</span></td>
+        <td style="font-size:12px; color:var(--blanco-suave);">${c.descripcion}</td>
+        <td class="peso-max">${c.pesoMaxTon} T</td>
+        <td class="precio">${fmt(c.tarifa)}</td>
+        </tr>`).join('');
+
+        tbIE.innerHTML = categorias.ie.map(c => `
+        <tr>
+        <td><span class="cat-badge ie">${c.nombre}</span></td>
+        <td style="font-size:12px; color:var(--blanco-suave);">${c.descripcion}</td>
+        <td class="peso-max">${c.pesoMaxTon} T</td>
+        <td class="precio" style="color:var(--verde);">${fmt(c.tarifa)}</td>
+        </tr>`).join('');
+        }
+
+        // Llena el <select> de categorías del formulario de cobro efectivo.
+        // Cada <option> guarda data-tarifa y data-peso para calcular el resumen visual previo.
+        // Los grupos (optsNormales / optsIE) se muestran/ocultan según el toggle residente.
+        function renderSelectCategorias() {
+        const optsN  = document.getElementById('optsNormales');
+        const optsIE = document.getElementById('optsIE');
+
+        // data-tarifa y data-peso se usan en actualizarResumenEfectivo() para el preview
+        optsN.innerHTML = categorias.normales.map(c =>
+        `<option value="${c.nombre}" data-tarifa="${c.tarifa}" data-peso="${c.pesoMaxTon}">
+        Categoría ${c.nombre} — ${c.descripcion.substring(0,45)}... — ${fmt(c.tarifa)}
+        </option>`).join('');
+
+        optsIE.innerHTML = categorias.ie.map(c =>
+        `<option value="${c.nombre}" data-tarifa="${c.tarifa}" data-peso="${c.pesoMaxTon}">
+        Categoría ${c.nombre} — ${c.descripcion.substring(0,40)}... — ${fmt(c.tarifa)}
+        </option>`).join('');
+        }
+
+
+        // ─── TOGGLE RESIDENTE ────────────────────────────────────────────────────────────
+
+        // Alterna el estado "es residente" cuando el operador hace clic en el toggle.
+        // Cuando está activo: muestra solo las categorías IE y oculta las normales.
+        // El servidor C++ también respeta este flag al recibir el cobro (campo es_residente).
+        function toggleResidente() {
+        esResidente = !esResidente; // invierte el estado actual (false↔true)
+
+        const el     = document.getElementById('toggleResidente'); // contenedor del toggle
+        const ck     = document.getElementById('checkVisual');     // símbolo "✓"
+        const optsIE = document.getElementById('optsIE');          // grupo de opciones IE en el select
+        const optsN  = document.getElementById('optsNormales');    // grupo de opciones normales
+        const sel    = document.getElementById('efCategoria');     // el select completo
+
+        el.classList.toggle('activo', esResidente);         // aplica/quita estilo visual del toggle
+        ck.textContent = esResidente ? '✓' : '';            // muestra o borra el checkmark
+
+        optsIE.style.display = esResidente ? ''     : 'none'; // muestra IE solo si es residente
+        optsN.style.display  = esResidente ? 'none' : '';     // oculta normales si es residente
+
+        sel.value = ''; // resetea la selección al cambiar modo (evita categoría incorrecta)
+        document.getElementById('resumenEfectivo').style.display = 'none'; // oculta el resumen previo
+        }
+
+
+        // ─── BUSCAR PLACA ────────────────────────────────────────────────────────────────
+
+        // Envía la placa al servidor C++ y muestra el panel correspondiente.
+        // Si el servidor la encuentra (tiene TAG): muestra panelTag con saldo y cobro automático.
+        // Si no la encuentra: muestra panelSinTag para cobro en efectivo manual.
+        async function buscarPlaca() {
+        const placa = document.getElementById('inputPlaca').value.trim().toUpperCase();
+        if (!placa) { alert('Ingrese una placa'); return; } // validación mínima antes de hacer fetch
+
+        const loader = document.getElementById('loaderBuscar');
+        loader.classList.add('visible'); // muestra el spinner en el botón
+
+        try {
+        // GET /api/buscar-placa?placa=XXX → el servidor responde con JSON
+        const r = await fetch(`${API}/api/buscar-placa?placa=${placa}`);
+        const d = await r.json(); // parsea la respuesta JSON del servidor
+
+        if (d.error) { alert('⚠️ ' + d.error); return; } // muestra error si el servidor lo indica
+
+        ultimaBusqueda = d; // guarda el resultado para usarlo en cobrarTag() y cobrarEfectivo()
+        document.getElementById('estadoVehiculo').classList.add('visible'); // muestra la sección de resultado
+
+        if (d.encontrado) {
+        mostrarPanelTag(d);    // vehículo con TAG registrado
+        } else {
+        mostrarPanelSinTag(d); // vehículo sin TAG (pago en efectivo)
+        }
+
+        } catch(e) {
+        alert('❌ No se puede conectar con el servidor. Asegúrese de que trabajofinal.exe está ejecutándose en el puerto 8080.');
+        } finally {
+        loader.classList.remove('visible'); // siempre oculta el spinner, haya error o no
+        }
+        }
+
+        // Llena el panel izquierdo con los datos del vehículo con TAG encontrado.
+        // Muestra: propietario, categoría, peso, saldo, resumen de cobro y botones de acción.
+        // El objeto "d" viene directo del JSON del servidor (/api/buscar-placa).
+        function mostrarPanelTag(d) {
+        document.getElementById('panelTag').style.display    = 'block'; // muestra el panel TAG
+        document.getElementById('panelSinTag').style.display = 'none';  // oculta el panel sin TAG
+
+        // Muestra u oculta el badge "Hora pico" según lo que informó el servidor
+        document.getElementById('picoBadgeSide').style.display = d.horario_pico ? 'inline-flex' : 'none';
+
+        // Construye las tarjetas de info del vehículo (propietario, categoría, peso, placa)
+        document.getElementById('infoTag').innerHTML = `
+        <div class="info-item">
+        <div class="info-item-label">Propietario</div>
+        <div class="info-item-valor">${d.propietario}</div>
+        </div>
+        <div class="info-item">
+        <div class="info-item-label">Categoría</div>
+        <div class="info-item-valor">${d.categoria}</div>
+        </div>
+        <div class="info-item">
+        <div class="info-item-label">Peso Registrado</div>
+        <div class="info-item-valor">${d.peso_ton} T</div>
+        </div>
+        <div class="info-item">
+        <div class="info-item-label">Placa</div>
+        <div class="info-item-valor" style="color:var(--amarillo);">${d.placa}</div>
+        </div>`;
+
+        // Muestra el saldo TAG; si no alcanza para el cobro, lo pinta en rojo ("bajo")
+        const saldoEl = document.getElementById('saldoValor');
+        saldoEl.textContent = fmt(d.saldo);
+        saldoEl.className   = 'saldo-valor' + (d.saldo < d.total ? ' bajo' : '');
+
+        // Construye el resumen de cobro: tarifa base + recargo si aplica + total
+        // El recargo ya viene calculado por el servidor (no lo calcula el JS)
+        document.getElementById('resumenTag').innerHTML = `
+        <div class="resumen-fila">
+        <span class="etiqueta">Tarifa base (Cat. ${d.categoria})</span>
+        <span class="monto">${fmt(d.tarifa_base)}</span>
+        </div>
+        ${d.recargo > 0 ? `
+        <div class="resumen-fila">
+        <span class="etiqueta">⚡ Recargo horario pico (+10%)</span>
+        <span class="monto recargo">${fmt(d.recargo)}</span>
+        </div>` : ''}
+        <div class="resumen-fila total-fila">
+        <span class="etiqueta" style="font-weight:700;">TOTAL A COBRAR</span>
+        <span class="monto total">${fmt(d.total)}</span>
+        </div>`;
+
+        // Muestra la alerta de saldo insuficiente si el servidor indicó que no alcanza
+        document.getElementById('alertaSaldo').classList.toggle('visible', !d.saldo_suficiente);
+
+        // Muestra "Cobrar por TAG" solo si hay saldo; si no, muestra "Pagar en efectivo"
+        document.getElementById('btnCobrarTag').style.display      = d.saldo_suficiente  ? 'flex' : 'none';
+        document.getElementById('btnForzarEfectivo').style.display = !d.saldo_suficiente ? 'flex' : 'none';
+        }
+
+        // Llena el panel izquierdo indicando que el vehículo NO tiene TAG registrado.
+        // Muestra la placa y el badge de hora pico si aplica.
+        // El operador deberá ir al formulario de cobro efectivo.
+        function mostrarPanelSinTag(d) {
+        document.getElementById('panelTag').style.display    = 'none';  // oculta el panel TAG
+        document.getElementById('panelSinTag').style.display = 'block'; // muestra el panel sin TAG
+        document.getElementById('placaSinTagLabel').textContent = d.placa; // muestra la placa buscada
+        // Muestra u oculta el badge "Hora pico" según el servidor
+        document.getElementById('picoBadgeSinTag').style.display = d.horario_pico ? 'inline-flex' : 'none';
+        }
+
+
+        // ─── COBRAR TAG ──────────────────────────────────────────────────────────────────
+
+        // Envía la placa al servidor para descontar el cobro del saldo TAG.
+        // El servidor verifica saldo, descuenta, guarda en historial y retorna el recibo.
+        async function cobrarTag() {
+        if (!ultimaBusqueda) return; // seguridad: no hacer nada si no hay búsqueda previa
+        const placa = ultimaBusqueda.placa; // usa la placa de la última búsqueda
+
+        const body = new URLSearchParams({ placa }); // arma el cuerpo del POST
+        const r = await fetch(`${API}/api/cobrar-tag`, { method: 'POST', body }); // POST /api/cobrar-tag
+        const d = await r.json(); // parsea la respuesta
+
+        if (d.error) { alert('⚠️ ' + d.error); return; } // muestra error si el servidor lo indica
+        mostrarRecibo(d);   // muestra el modal de recibo con los datos del cobro
+        actualizarStats();  // actualiza las tarjetas de estadísticas del día
+        }
+
+
+        // ─── PASO A COBRO EFECTIVO ───────────────────────────────────────────────────────
+
+        // Llamado cuando un vehículo con TAG tiene saldo insuficiente.
+        // Navega a la vista de cobro efectivo y pre-rellena la placa en el formulario.
+        function forzarEfectivo() {
+        if (!ultimaBusqueda) return;
+        setPlacaCobro(ultimaBusqueda.placa); // rellena el campo placa del form efectivo
+        mostrarVista('cobro');               // navega a la pestaña de cobro efectivo
+
+        // setTimeout(0) espera a que el DOM renderice la vista antes de escribir en el input
+        setTimeout(() => {
+        const input = document.getElementById('efPlaca');
+        const placa = ultimaBusqueda?.placa || document.getElementById('inputPlaca')?.value;
+        if (input && placa) input.value = placa.toUpperCase();
+        }, 0);
+        }
+
+        // Llamado cuando el vehículo no tiene TAG y el operador hace clic en "Registrar y Cobrar".
+        // Mismo comportamiento que forzarEfectivo() pero viene del panel sin TAG.
+        function mostrarFormEfectivo() {
+        if (!ultimaBusqueda) return;
+        setPlacaCobro(ultimaBusqueda.placa); // pre-rellena la placa en el formulario
+        mostrarVista('cobro');               // navega a la pestaña de cobro efectivo
+
+        setTimeout(() => {
+        const input = document.getElementById('efPlaca');
+        const placa = ultimaBusqueda?.placa || document.getElementById('inputPlaca')?.value;
+        if (input && placa) input.value = placa.toUpperCase();
+        }, 0);
+        }
+
+
+        // ─── RESUMEN PREVIO AL COBRO EFECTIVO ────────────────────────────────────────────
+
+        // Muestra un resumen visual ORIENTATIVO mientras el operador llena el formulario.
+        // IMPORTANTE: este cálculo es solo para mostrar al operador; el definitivo lo hace C++.
+        // Los datos de tarifa y pesoMax vienen del data-* del <option> seleccionado,
+        // que a su vez vienen de /api/categorias (es decir, del servidor).
+        function actualizarResumenEfectivo() {
+        const catEl  = document.getElementById('efCategoria');
+        const pesoEl = document.getElementById('efPeso');
+        const opt    = catEl.selectedOptions[0]; // opción seleccionada en el select
+
+        // Si no hay categoría seleccionada, oculta el resumen y termina
+        if (!opt || !opt.value) {
+        document.getElementById('resumenEfectivo').style.display = 'none';
+        return;
+        }
+
+        const tarifa  = parseFloat(opt.dataset.tarifa); // tarifa base del data-tarifa del <option>
+        const pesoMax = parseFloat(opt.dataset.peso);   // límite de peso del data-peso del <option>
+        const peso    = parseFloat(pesoEl.value) || 0;  // peso ingresado (0 si vacío)
+        const pico    = new Date().getHours() >= 6 && new Date().getHours() < 9; // hora pico local
+        const recargo = pico ? tarifa * 0.10 : 0;       // +10% si es hora pico
+        const exceso  = peso > 0 && peso > pesoMax + 1.0; // true si excede límite + tolerancia 1T
+        const multa   = exceso ? 1266222 : 0;            // multa fija si hay exceso
+        const total   = tarifa + recargo + multa;        // total estimado
+
+        // Muestra u oculta la alerta roja de exceso de peso según si hay exceso
+        document.getElementById('alertaMultaEf').classList.toggle('visible', exceso);
+
+        // Construye y muestra el resumen de cobro estimado
+        const resumen = document.getElementById('resumenEfectivo');
+        resumen.style.display = 'block';
+        resumen.innerHTML = `
+        <div class="resumen-fila">
+        <span class="etiqueta">Tarifa base (Cat. ${opt.value})</span>
+        <span class="monto">${fmt(tarifa)}</span>
+        </div>
+        ${recargo > 0 ? `
+        <div class="resumen-fila">
+        <span class="etiqueta">⚡ Recargo horario pico (+10%)</span>
+        <span class="monto recargo">${fmt(recargo)}</span>
+        </div>` : ''}
+        ${exceso ? `
+        <div class="resumen-fila">
+        <span class="etiqueta">🚨 Multa por exceso de peso</span>
+        <span class="monto multa">${fmt(multa)}</span>
+        </div>` : ''}
+        <div class="resumen-fila total-fila">
+        <span class="etiqueta" style="font-weight:700;">TOTAL A COBRAR</span>
+        <span class="monto total">${fmt(total)}</span>
+        </div>`;
+        }
+
+
+        // ─── COBRAR EFECTIVO ──────────────────────────────────────────────────────────────
+
+        // Envía los datos del formulario al servidor para registrar el cobro en efectivo.
+        // El servidor calcula el total definitivo, guarda en historial y retorna el recibo.
+        async function cobrarEfectivo() {
+
+        // Prioridad de placa: usa la última búsqueda si existe (más confiable),
+        // de lo contrario usa lo que escribió el operador en el campo del form.
+        let placa = '';
+        if (ultimaBusqueda && ultimaBusqueda.placa) {
+        placa = ultimaBusqueda.placa;                                      // de la búsqueda previa
+        } else {
+        placa = document.getElementById('efPlaca').value.trim().toUpperCase(); // del campo del form
+        }
+
+        const cat  = document.getElementById('efCategoria').value; // categoría seleccionada
+        const peso = document.getElementById('efPeso').value;       // peso ingresado
+
+        // Validaciones mínimas antes de enviar al servidor
+        if (!placa) { alert('Ingrese la placa del vehículo'); return; }
+        if (!cat)   { alert('Seleccione una categoría');       return; }
+        if (!peso)  { alert('Ingrese el peso del vehículo');   return; }
+
+        // Construye el cuerpo del POST en formato application/x-www-form-urlencoded
+        // es_residente: '1' si el toggle está activo, '0' si no
+        const body = new URLSearchParams({
+        placa,
+        categoria:    cat,
+        peso,
+        es_residente: esResidente ? '1' : '0'
+        });
+
+        // POST /api/cobrar-efectivo → el servidor calcula, guarda y retorna el recibo
+        const r = await fetch(`${API}/api/cobrar-efectivo`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+        });
+
+        const d = await r.json(); // parsea el JSON de respuesta del servidor
+
+        if (d.error) { alert('⚠️ ' + d.error); return; } // muestra error si el servidor lo indica
+
+        mostrarRecibo(d); // muestra el modal de recibo con los datos reales calculados por C++
+
+        // Limpia el formulario después del cobro exitoso
+        document.getElementById('efPlaca').value              = '';
+        document.getElementById('efPeso').value               = '';
+        document.getElementById('efCategoria').value          = '';
+        document.getElementById('resumenEfectivo').style.display = 'none';
+        document.getElementById('alertaMultaEf').classList.remove('visible');
+
+        actualizarStats(); // refresca las estadísticas del día en la pantalla de inicio
+        }
+
+
+        // ─── MODAL RECIBO ─────────────────────────────────────────────────────────────────
+
+        // Construye y muestra el modal de recibo de cobro.
+        // Recibe el objeto "d" con los datos del cobro (viene del servidor o del historial).
+        // Incluye: placa, categoría, método, tarifa, recargo, multa, total, hora y fecha.
+        function mostrarRecibo(d) {
+        const modal = document.getElementById('modalRecibo');
+        const cont  = document.getElementById('reciboContenidoInt'); // div interior del modal
+
+        // Construye el HTML del recibo con template literals
+        // Las líneas opcionales (recargo, multa, saldo_nuevo) solo aparecen si tienen valor
+        cont.innerHTML = `
+        <div class="recibo-placa">${d.placa}</div>
+        <div class="recibo-detalle">
+        <div class="recibo-linea">
+        <span class="r-label">Categoría</span>
+        <span class="r-valor">${d.categoria}</span>
+        </div>
+        <div class="recibo-linea">
+        <span class="r-label">Método de pago</span>
+        <span class="r-valor" style="color:${d.metodo==='TAG'?'var(--verde)':'var(--azul)'};">${d.metodo}</span>
+        </div>
+        <div class="recibo-linea">
+        <span class="r-label">Tarifa base</span>
+        <span class="r-valor">${fmt(d.tarifa_base)}</span>
+        </div>
+        ${d.recargo > 0 ? `
+        <div class="recibo-linea">
+        <span class="r-label">Recargo hora pico</span>
+        <span class="r-valor" style="color:var(--naranja);">${fmt(d.recargo)}</span>
+        </div>` : ''}
+        ${d.multa > 0 ? `
+        <div class="recibo-linea">
+        <span class="r-label">🚨 Multa exceso peso</span>
+        <span class="r-valor rojo">${fmt(d.multa)}</span>
+        </div>` : ''}
+        <div class="recibo-linea">
+        <span class="r-label" style="font-weight:700;">TOTAL COBRADO</span>
+        <span class="r-valor amarillo">${fmt(d.total)}</span>
+        </div>
+        ${d.saldo_nuevo !== undefined ? `
+        <div class="recibo-linea">
+        <span class="r-label">Saldo TAG restante</span>
+        <span class="r-valor verde">${fmt(d.saldo_nuevo)}</span>
+        </div>` : ''}
+        <div class="recibo-linea">
+        <span class="r-label">Hora de paso</span>
+        <span class="r-valor mono">${d.hora}</span>
+        </div>
+        <div class="recibo-linea">
+        <span class="r-label">Fecha</span>
+        <span class="r-valor mono">${d.fecha}</span>
+        </div>
+        <div class="recibo-linea">
+        <span class="r-label">N° Recibo</span>
+        <span class="r-valor mono">#${String(d.recibo_id).padStart(6,'0')}</span>
+        </div>
+        </div>
+        ${d.hay_multa ? `
+        <div class="alerta alerta-multa visible">
+        <span class="alerta-icono">🚨</span>
+        <div><strong>VEHÍCULO DETENIDO POR EXCESO DE PESO</strong><br>
+        Notifique a las autoridades competentes.</div>
+        </div>` : ''}`;
+
+        modal.classList.add('visible'); // hace visible el modal
+
+        // Limpia el estado del panel izquierdo después de un cobro exitoso
+        document.getElementById('estadoVehiculo').classList.remove('visible');
+        document.getElementById('panelTag').style.display    = 'none';
+        document.getElementById('panelSinTag').style.display = 'none';
+        document.getElementById('inputPlaca').value          = '';
+        }
+
+        // Cierra el modal del recibo quitando la clase "visible"
+        function cerrarRecibo() {
+        document.getElementById('modalRecibo').classList.remove('visible');
+        }
+
+
+        // ─── HISTORIAL ───────────────────────────────────────────────────────────────────
+
+        // Carga los últimos 50 cobros del servidor y los muestra en la tabla de historial.
+        // Cada fila tiene un botón 👁 que llama a verReciboHistorial() para ver el recibo.
+        async function cargarHistorial() {
+        const tbody = document.getElementById('tbodyHistorial');
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted" style="padding:24px;">Cargando...</td></tr>';
+
+        try {
+        const r = await fetch(`${API}/api/historial?limit=50`); // GET /api/historial
+        const d = await r.json(); // array de objetos con los cobros
+
+        if (!d.length) { // si el array está vacío no hay registros todavía
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted" style="padding:24px;">No hay registros aún.</td></tr>';
+        return;
+        }
+
+        document.getElementById('subtituloHistorial').textContent = `${d.length} registros encontrados`;
+
+        // map() convierte cada cobro en una fila <tr> HTML
+        tbody.innerHTML = d.map(r => `
+        <tr>
+        <td class="mono" style="color:var(--gris-claro);">#${String(r.id).padStart(4,'0')}</td>
+        <td class="mono" style="color:var(--amarillo); font-weight:700;">${r.placa}</td>
+        <td><span class="cat-badge ${r.categoria.includes('E')?'ie':''}">${r.categoria}</span></td>
+        <td class="mono" style="color:var(--gris-claro);">${r.peso}</td>
+        <td class="mono">${fmt(r.tarifa)}</td>
+        <td class="mono" style="color:var(--naranja);">${r.recargo > 0 ? fmt(r.recargo) : '—'}</td>
+        <td>${r.multa > 0 ? `<span class="multa-badge">${fmt(r.multa)}</span>` : '—'}</td>
+        <td class="amt">${fmt(r.total)}</td>
+        <td><span class="tag-badge ${r.metodo==='TAG'?'tag':'efect'}">${r.metodo}</span></td>
+        <td class="mono" style="font-size:11px;">${r.hora}</td>
+        <td class="mono" style="font-size:11px;">${r.fecha}</td>
+        <td>
+        <!-- JSON.stringify(r) pasa el objeto completo a verReciboHistorial -->
+        <button class="btn btn-ghost btn-sm"
+        onclick='verReciboHistorial(${JSON.stringify(r)})'>👁</button>
+        </td>
+        </tr>`).join('');
+
+        } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center" style="color:var(--rojo); padding:24px;">❌ No se pudo conectar con el servidor.</td></tr>';
+        }
+        }
+
+
+        // ─── ESTADÍSTICAS DEL DÍA ────────────────────────────────────────────────────────
+
+        // Pide al servidor C++ los contadores del día y los muestra en las tarjetas de inicio.
+        // El servidor filtra en la BD por fecha de hoy (más eficiente que bajar 200 registros).
+        async function actualizarStats() {
+        try {
+        const r = await fetch(`${API}/api/stats`); // GET /api/stats → {total, tag, efectivo}
+        const d = await r.json();
+        document.getElementById('statTotal').textContent    = d.total;    // total de vehículos hoy
+        document.getElementById('statTag').textContent      = d.tag;      // cobros por TAG hoy
+        document.getElementById('statEfectivo').textContent = d.efectivo; // cobros en efectivo hoy
+        } catch(e) {} // silencia errores de red (las tarjetas simplemente no se actualizan)
+        }
+
+
+        // ─── VER RECIBO DESDE HISTORIAL ──────────────────────────────────────────────────
+
+        // Recibe un objeto de fila del historial y lo muestra en el modal de recibo.
+        // Se llama al hacer clic en el botón 👁 de una fila del historial.
+        // Nota: en el historial la tarifa está guardada como "tarifa" (no "tarifa_base"),
+        // por eso se mapea manualmente al llamar mostrarRecibo().
+        function verReciboHistorial(r) {
+        mostrarRecibo({
+        placa:      r.placa,
+        categoria:  r.categoria,
+        metodo:     r.metodo,
+        tarifa_base: r.tarifa, // el historial guarda "tarifa", el recibo espera "tarifa_base"
+        recargo:    r.recargo,
+        multa:      r.multa,
+        total:      r.total,
+        hora:       r.hora,
+        fecha:      r.fecha,
+        recibo_id:  r.id,
+        hay_multa:  r.multa > 0 // true si hubo multa → activa la alerta roja en el recibo
+        });
+        }
+
+
+        // ─── INICIALIZACIÓN ──────────────────────────────────────────────────────────────
+
+        // Se ejecuta cuando el DOM está completamente cargado (antes de este punto
+        // los elementos HTML no existen y no se puede hacer getElementById).
+        window.addEventListener('DOMContentLoaded', () => {
+        cargarCategorias(); // llena las tablas de tarifas y el select de categorías
+        actualizarStats();  // muestra los contadores del día en la pantalla de inicio
+
+        // Permite buscar una placa presionando Enter en el campo de texto
+        document.getElementById('inputPlaca').addEventListener('keydown', e => {
+        if (e.key === 'Enter') buscarPlaca();
+        });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+﻿  trabajofinal.cpp
+LINK : warning LNK4067: punto de entrada ambiguo; se seleccionó 'mainCRTStartup'
+  lo_que_sea.vcxproj -> G:\lo_que_sea\x64\Debug\lo_que_sea.exe

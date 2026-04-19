@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="lo_que_sea.vcxproj" Id="99f65709-e7fa-413b-a49c-7cb2a917315d" />
+</Solution>
