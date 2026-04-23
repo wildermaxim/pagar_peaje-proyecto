@@ -5,7 +5,7 @@ echo ================================
 echo  Iniciando servidor de peaje...
 echo ================================
 
-REM Ir a la carpeta donde está el .bat
+REM Ir a la carpeta del proyecto (donde está el .bat)
 cd /d %~dp0
 
 REM Verificar ejecutable
@@ -28,10 +28,18 @@ if not exist css (
     exit
 )
 
-REM Verificar base de datos
-if not exist database.db (
-    echo Aviso: No existe database.db, se creara automaticamente
-)
+echo.
+echo Iniciando servidor...
+echo.
+
+REM Ejecutar servidor SIN abrir otra consola
+start "" /B lo_que_sea.exe
+
+REM Esperar a que arranque
+timeout /t 2 >nul
+
+REM Abrir navegador
+start http://localhost:8080
 
 echo.
 echo Servidor corriendo en:
@@ -39,7 +47,5 @@ echo http://localhost:8080
 echo.
 echo Presiona CTRL + C para detener
 echo.
-
-lo_que_sea.exe
 
 pause

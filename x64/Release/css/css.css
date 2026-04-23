@@ -6,36 +6,54 @@
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-/* ── Variables ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   css.css — Peaje Pamplonita · Sistema de Recaudo
+   Tema: Blanco · Azul · Rojo (versión completa 1:1)
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/* ── Variables (MODIFICADAS) ───────────────────────────── */
 :root {
-  --negro:      #0a0c0e;
-  --carbono:    #131619;
-  --plomo:      #1e2226;
-  --gris-oscuro:#2b3036;
-  --gris-medio: #4a5260;
-  --gris-claro: #8a95a3;
-  --borde:      #2e3540;
-  --blanco:     #f0f4f8;
-  --blanco-suave:#d8dfe8;
-  --amarillo:   #f5c518;
-  --amarillo-suave:#f5c51822;
-  --verde:      #22c55e;
-  --verde-suave:#22c55e18;
-  --rojo:       #ef4444;
-  --rojo-suave: #ef444418;
-  --azul:       #3b82f6;
-  --azul-suave: #3b82f618;
-  --naranja:    #f97316;
+  --negro:      #5b8cb28c;
+  --carbono:    #b2b2b2;
+  --plomo:      #8f9cc6a3;
+  --gris-oscuro:#ffffffb9;
+  --gris-medio: #000000;
+  --gris-claro: #000000;
+  --borde:      #0047f941;
+
+  --blanco:     #0d22bc;
+  --blanco-suave:#000000;
+
+  --azul:       #114478;
+  --azul-suave: #1588f349;
+
+  --rojo:       #643706;
+  --rojo-suave: #d32f2f1a;
+
+  /* Reemplazos coherentes */
+  --amarillo:   var(--azul);
+  --amarillo-suave: var(--azul-suave);
+
+  --verde:      #7791b3;
+  --verde-suave:#042060a2;
+
+  --naranja:    var(--rojo);
 
   --radio: 6px;
   --radio-lg: 10px;
-  --sombra: 0 4px 24px rgba(0,0,0,0.4);
-  --sombra-lg: 0 8px 40px rgba(0,0,0,0.6);
+  --sombra: 0 4px 24px rgba(0, 22, 220, 0.4);
+  --sombra-lg: 0 8px 40px rgb(10, 20, 128);
   --fuente: 'IBM Plex Sans', sans-serif;
   --mono: 'IBM Plex Mono', monospace;
 
   --trans: all 0.2s cubic-bezier(0.4,0,0.2,1);
 }
+
+/* ── TODO LO DEMÁS ES EXACTAMENTE TU CSS ORIGINAL ── */
+
+/* Copia aquí TODO tu CSS desde: */
 
 /* ── Reset & base ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,6 +69,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* (SIGUE PEGANDO TODO TU CSS ORIGINAL SIN CAMBIAR NADA MÁS) */
 /* ── Header ──────────────────────────────────────────────── */
 .header {
   background: var(--carbono);
@@ -121,7 +140,7 @@ body {
 
 .badge-pico {
   background: var(--naranja);
-  color: white;
+  color: rgb(0, 0, 0);
   font-size: 10px;
   font-weight: 700;
   padding: 3px 8px;
@@ -278,19 +297,19 @@ body {
   background: var(--amarillo);
   color: var(--negro);
 }
-.btn-primary:hover { background: #e6b800; box-shadow: 0 4px 16px rgba(245,197,24,0.3); }
+.btn-primary:hover { background: #ffffff; box-shadow: 0 4px 16px rgba(22, 68, 168, 0.756); }
 
 .btn-success {
   background: var(--verde);
-  color: white;
+  color: rgb(0, 0, 0);
 }
-.btn-success:hover { background: #16a34a; box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+.btn-success:hover { background: #5d5be9; box-shadow: 0 4px 16px rgba(3, 14, 86, 0.682); }
 
 .btn-danger {
   background: var(--rojo);
-  color: white;
+  color: rgb(0, 0, 0);
 }
-.btn-danger:hover { background: #dc2626; }
+.btn-danger:hover { background: #f9f9f9; }
 
 .btn-ghost {
   background: transparent;
@@ -301,7 +320,7 @@ body {
 
 .btn-azul {
   background: var(--azul);
-  color: white;
+  color: rgb(0, 0, 0);
 }
 .btn-azul:hover { background: #2563eb; }
 
@@ -631,7 +650,7 @@ body {
 .alerta-multa {
   background: var(--rojo-suave);
   border: 1px solid var(--rojo);
-  color: #fca5a5;
+  color: #4245f1;
 }
 
 .alerta-exito {

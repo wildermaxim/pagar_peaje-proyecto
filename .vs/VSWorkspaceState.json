@@ -4,9 +4,8 @@
     "\\c++",
     "\\Debug",
     "\\x64",
-    "\\x64\\Release",
-    "\\x64\\Release\\html"
+    "\\x64\\Release"
   ],
-  "SelectedNode": "\\c++\\trabajofinal.cpp",
+  "SelectedNode": "\\x64\\Release\\sqlite3.dll",
   "PreviewInSolutionExplorer": false
 }

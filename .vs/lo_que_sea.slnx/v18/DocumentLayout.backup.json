@@ -1,14 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "G:\\proyecto_final_peaje_electronico\\",
+  "WorkspaceRootPath": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|G:\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|solutionrelative:c\u002B\u002B\\trabajofinal.cpp||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|G:\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|solutionrelative:x64\\Release\\html\\p.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\css\\css.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{99F65709-E7FA-413B-A49C-7CB2A917315D}|lo_que_sea.vcxproj|solutionrelative:x64\\Release\\css\\css.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,13 +30,25 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "css.css",
+              "DocumentMoniker": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\css\\css.css",
+              "RelativeDocumentMoniker": "x64\\Release\\css\\css.css",
+              "ToolTip": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\css\\css.css",
+              "RelativeToolTip": "x64\\Release\\css\\css.css",
+              "ViewState": "AgIAAPgAAAAAAAAAAAAAAAUBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-21T01:03:17.664Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "trabajofinal.cpp",
-              "DocumentMoniker": "G:\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp",
+              "DocumentMoniker": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp",
               "RelativeDocumentMoniker": "c\u002B\u002B\\trabajofinal.cpp",
-              "ToolTip": "G:\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp",
-              "RelativeToolTip": "c\u002B\u002B\\trabajofinal.cpp",
-              "ViewState": "AgIAAOIAAAAAAAAAAAAuwEICAAARAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\c\u002B\u002B\\trabajofinal.cpp*",
+              "RelativeToolTip": "c\u002B\u002B\\trabajofinal.cpp*",
+              "ViewState": "AgIAALoAAAAAAAAAAAAAAAwBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-04-18T23:24:21.621Z",
               "EditorCaption": ""
@@ -41,11 +57,11 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "p.html",
-              "DocumentMoniker": "G:\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html",
+              "DocumentMoniker": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html",
               "RelativeDocumentMoniker": "x64\\Release\\html\\p.html",
-              "ToolTip": "G:\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html",
+              "ToolTip": "C:\\Users\\hippo\\Downloads\\proyecto_final_peaje_electronico\\x64\\Release\\html\\p.html",
               "RelativeToolTip": "x64\\Release\\html\\p.html",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAANMDAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2026-04-18T23:05:42.538Z",
               "EditorCaption": ""

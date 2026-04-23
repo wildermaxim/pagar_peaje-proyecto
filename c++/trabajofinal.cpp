@@ -63,7 +63,7 @@ bool esHoraPico() {
     tm tmPtr;                    // estructura de fecha/hora
     localtime_s(&tmPtr, &t);     // convierte a hora local
     // tm_hour es el campo de la hora (0-23); 6 = 6AM, 9 = 9AM (no incluida)
-    return (tmPtr.tm_hour >= 8 && tmPtr.tm_hour < 12);
+    return (tmPtr.tm_hour >= 7 && tmPtr.tm_hour < 10);
 }
 
 // Valida que una placa tenga formato colombiano (ABC123) o venezolano (AB123CD)
@@ -192,10 +192,10 @@ double getTarifa(string cat) {
 // Estos valores son exactamente los mismos que se envían al JS en /api/categorias,
 // garantizando consistencia entre lo que ve el operador y lo que calcula el servidor.
 double getPesoMax(string cat) {
-    if (cat == "I")  return 5.0;
-    if (cat == "II") return 17.0;
-    if (cat == "III")return 10.1;
-    if (cat == "IV") return 17.0;
+    if (cat == "I")  return 7.0;
+    if (cat == "II") return 10.0;
+    if (cat == "III")return 17.0;
+    if (cat == "IV") return 20.0;
     if (cat == "V")  return 28.0;
 
     // 🆕 nuevas categorías
@@ -203,7 +203,7 @@ double getPesoMax(string cat) {
     if (cat == "VII") return 40.0;
 
     // IE original
-    if (cat == "IE") return 5.0;
+    if (cat == "IE") return 7.0;
 
     return 5.0;
 }
@@ -251,13 +251,14 @@ string router(string req) {
     return http(
         "{"
         "\"normales\":["
-        "{\"nombre\":\"I\",\"descripcion\":\"2 ejes\",\"pesoMaxTon\":5,\"tarifa\":9500},"
-        "{\"nombre\":\"II\",\"descripcion\":\"Bus\",\"pesoMaxTon\":17,\"tarifa\":13300},"
-        "{\"nombre\":\"III\",\"descripcion\":\"Camion\",\"pesoMaxTon\":10.1,\"tarifa\":13300},"
-        "{\"nombre\":\"IV\",\"descripcion\":\"Camion grande\",\"pesoMaxTon\":17,\"tarifa\":13300},"
+        "{\"nombre\":\"I\",\"descripcion\":\"automoviles,camperos,camionetas y microbuses con ejes de llanta sencilla\",\"pesoMaxTon\":7,\"tarifa\":9500},"
+        "{\"nombre\":\"II\",\"descripcion\":\"Buses,busetas y microbuses con eje trasero de doble llanta\",\"pesoMaxTon\":10,\"tarifa\":13300},"
+        "{\"nombre\":\"III\",\"descripcion\":\"Camiones pequellos de dos ejes\",\"pesoMaxTon\":17,\"tarifa\":13300},"
+        "{\"nombre\":\"IV\",\"descripcion\":\"Camiones grandes de dos ejes\",\"pesoMaxTon\":20,\"tarifa\":13300},"
         "{\"nombre\":\"V\",\"descripcion\":\"Camiones de tres y cuatro ejes\",\"pesoMaxTon\":28,\"tarifa\":29700},"
         "{\"nombre\":\"VI\",\"descripcion\":\"Camiones de cinco ejes\",\"pesoMaxTon\":35,\"tarifa\":38400},"
         "{\"nombre\":\"VII\",\"descripcion\":\"Camiones de seis ejes o mas\",\"pesoMaxTon\":40,\"tarifa\":43700}"
+    
         "],"
         "\"ie\":["
         "{\"nombre\":\"IE\",\"descripcion\":\"Residente\",\"pesoMaxTon\":5,\"tarifa\":2400}"
@@ -592,7 +593,7 @@ int main() {
     // Crea las tablas en la BD (si aún no existen)
     initDB();
 
-    // Crea un socket TCP (SOCK_STREAM = orientado a conexión) sobre IPv4 (AF_INET)
+    // Crea un socket TCP (SOCK_STREAM = orientado a conexión) sobre IPv4 (AF_INET)s
     SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
 
     // Configura la dirección en la que escuchará el servidor:
